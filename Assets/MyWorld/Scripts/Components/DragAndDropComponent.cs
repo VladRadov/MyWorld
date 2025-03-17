@@ -9,28 +9,28 @@ public class DragAndDropComponent : EventTrigger
     private bool _dragging;
     private Transform _transform;
 
-    public ReactiveCommand DraggingStart = new();
-    public ReactiveCommand DraggingEnd = new();
+    public ReactiveCommand DraggingStartCommand = new();
+    public ReactiveCommand DraggingEndCommand = new();
 
     private void Start()
     {
         _transform = transform;
         _dragging = false;
 
-        ManagerUniRx.AddObjectDisposable(DraggingStart);
-        ManagerUniRx.AddObjectDisposable(DraggingEnd);
+        ManagerUniRx.AddObjectDisposable(DraggingStartCommand);
+        ManagerUniRx.AddObjectDisposable(DraggingEndCommand);
     }
 
     public override void OnPointerDown(PointerEventData eventData)
     {
-        DraggingStart.Execute();
+        DraggingStartCommand.Execute();
 
         _dragging = true;
     }
 
     public override void OnPointerUp(PointerEventData eventData)
     {
-        DraggingEnd.Execute();
+        DraggingEndCommand.Execute();
 
         _dragging = false;
     }
@@ -49,7 +49,7 @@ public class DragAndDropComponent : EventTrigger
 
     private void OnDestroy()
     {
-        ManagerUniRx.Dispose(DraggingStart);
-        ManagerUniRx.Dispose(DraggingEnd);
+        ManagerUniRx.Dispose(DraggingStartCommand);
+        ManagerUniRx.Dispose(DraggingEndCommand);
     }
 }

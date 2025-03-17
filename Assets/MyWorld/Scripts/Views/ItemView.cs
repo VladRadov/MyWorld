@@ -4,20 +4,36 @@ using UniRx;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(DragAndDropComponent))]
+[RequireComponent(typeof(EffectIncreaseComponent))]
 public class ItemView : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] private Rigidbody2D _rigidbody2D;
     [SerializeField] private DragAndDropComponent _dragAndDropComponent;
+    [SerializeField] private EffectIncreaseComponent _effectIncreaseComponent;
+
+    public DragAndDropComponent DragAndDropComponent => _dragAndDropComponent;
+    public EffectIncreaseComponent EffectIncreaseComponent => _effectIncreaseComponent;
+    public ReactiveCommand PlaceItemTriggerStayCommand = new();
+    public ReactiveCommand DestroyItemCommand = new();
+
+    public void SetRigidbodyType(RigidbodyType2D bodyType)
+        => _rigidbody2D.bodyType = bodyType;
 
     private void Start()
     {
-        _dragAndDropComponent.DraggingStart.Subscribe(_ => { SetRigidbodyType(RigidbodyType2D.Kinematic); });
-        _dragAndDropComponent.DraggingEnd.Subscribe(_ => { SetRigidbodyType(RigidbodyType2D.Dynamic); });
+        ManagerUniRx.AddObjectDisposable(PlaceItemTriggerStayCommand);
+        ManagerUniRx.AddObjectDisposable(DestroyItemCommand);
     }
 
-    private void SetRigidbodyType(RigidbodyType2D bodyType)
-        => _rigidbody2D.bodyType = bodyType;
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("PlaceItem"))
+        {
+            if (_rigidbody2D.bodyType == RigidbodyType2D.Dynamic)
+                PlaceItemTriggerStayCommand.Execute();
+        }
+    }
 
     private void OnValidate()
     {
@@ -26,5 +42,16 @@ public class ItemView : MonoBehaviour
 
         if (_dragAndDropComponent == null)
             _dragAndDropComponent = GetComponent<DragAndDropComponent>();
+
+        if (_effectIncreaseComponent == null)
+            _effectIncreaseComponent = GetComponent<EffectIncreaseComponent>();
+    }
+
+    private void OnDestroy()
+    {
+        DestroyItemCommand.Execute();
+
+        ManagerUniRx.Dispose(PlaceItemTriggerStayCommand);
+        ManagerUniRx.Dispose(DestroyItemCommand);
     }
 }

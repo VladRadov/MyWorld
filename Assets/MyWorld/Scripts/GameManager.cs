@@ -7,12 +7,8 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        //foreach (var service in _services)
-            //service.Initialize();
-
-        //var dragAndDropInputSystem = GetService<DragAndDropInputSystem>();
-
-
+        foreach (var service in _services)
+            service.Initialize();
     }
 
     private T GetService<T>() where T : BaseService

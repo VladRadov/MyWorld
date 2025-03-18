@@ -39,8 +39,8 @@ public class DragAndDropComponent : EventTrigger
     {
         if (_dragging)
         {
-            float mouseX = Mouse.current.position.x.ReadValue();
-            float mouseY = Mouse.current.position.y.ReadValue();
+            float mouseX = Touchscreen.current.position.x.ReadValue();
+            float mouseY = Touchscreen.current.position.y.ReadValue();
 
             var mousePosition = Camera.main.ScreenToWorldPoint(new Vector3(mouseX, mouseY, 0));
             _transform.position = new Vector2(mousePosition.x, mousePosition.y);
